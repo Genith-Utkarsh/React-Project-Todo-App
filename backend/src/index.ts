@@ -3,6 +3,7 @@ import dotenv  from "dotenv"
 import mongoose from "mongoose"
 import cookieParser from "cookie-parser"
 import { MONGO_URL } from "./config.js"
+
 dotenv.config()
 
 const app = express()
