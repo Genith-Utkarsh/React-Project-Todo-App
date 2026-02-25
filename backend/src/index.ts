@@ -4,6 +4,7 @@ import mongoose from 'mongoose';
 import cookieParser from 'cookie-parser';
 import { MONGO_URL } from './config.js';
 import todoRouter from './routes/todo.routes.js';
+import userRouter from './routes/user.routes.js';
 
 dotenv.config();
 
@@ -13,6 +14,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use('api/v1/todo', todoRouter);
+app.use('api/v1/user', userRouter);
 
 async function startServer() {
   try {
