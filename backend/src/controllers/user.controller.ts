@@ -8,6 +8,11 @@ export const userSignUp = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
 
+    if(!email || !password) {
+      return res.status(400).json({
+        msg : "Email and password required"
+      })
+    }
     // if user already exist
     const isUserExist = await User.findOne({ email });
 
@@ -17,16 +22,16 @@ export const userSignUp = async (req: Request, res: Response) => {
       });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 5);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = await User.create({
       email: email,
       password: hashedPassword,
     });
 
-    const token = jwt.sign({ userId: user._id }, JWT_SECRET);
+    const token = jwt.sign({ userId: user._id }, JWT_SECRET, {expiresIn : "1d"});
 
-    res.cookie('token', token);
+    res.cookie('token', token, {httpOnly : true});
 
     res.status(200).json({
       msg: 'Sign Up successfull',
@@ -43,6 +48,12 @@ export const userSignIn = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
 
+    if(!email || !password) {
+      return res.status(400).json({
+        msg : "Email and password is required."
+      })
+    }
+
     const isUserExist = await User.findOne({email});
 
     if(!isUserExist)
@@ -57,14 +68,14 @@ export const userSignIn = async (req: Request, res: Response) => {
     if(!comparePass)
     {
       return res.status(400).json({
-        msg : "Wrong password"
+        msg : "Invalid credentials"
       })
     }
 
 
-    const token  = jwt.sign({userId : isUserExist._id}, JWT_SECRET)
+    const token  = jwt.sign({userId : isUserExist._id}, JWT_SECRET, {expiresIn : "1d"} )
 
-    res.cookie("token", token)
+    res.cookie("token", token, {httpOnly : true})
 
     res.status(200).json({
       msg : "Signin Successful.",
@@ -73,6 +84,7 @@ export const userSignIn = async (req: Request, res: Response) => {
 
     
   } catch (err) {
+    console.log("signin error :" + err)
     res.status(500).json({
       msg: 'Server issue : Unable to sign in',
     });
